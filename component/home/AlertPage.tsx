@@ -1,8 +1,7 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import useSound from "use-sound";
-import alertSound from "../public/sound/alert.wav";
 
 interface Participant {
   name: string;
@@ -12,8 +11,8 @@ interface Participant {
 interface Activity {
   text: string;
   hasAmount: boolean;
-  min?: number;  // Make optional
-  max?: number;  // Make optional
+  min?: number;
+  max?: number;
 }
 
 interface Notification {
@@ -24,198 +23,204 @@ interface Notification {
   time: string;
 }
 
-// Grouped by region/culture for better matching
 const PARTICIPANTS: Participant[] = [
   // North America
-  { name: "Sophia Rodriguez", country: "United States" },
-  { name: "Ethan Thompson", country: "United States" },
-  { name: "Olivia Martin", country: "Canada" },
-  { name: "Liam Tremblay", country: "Canada" },
-  { name: "Diego Mendoza", country: "Mexico" },
-  { name: "Isabella Cruz", country: "Mexico" },
+  { name: "Madison Carter", country: "United States" },
+  { name: "Brandon Mitchell", country: "United States" },
+  { name: "Avery Cooper", country: "United States" },
+  { name: "Chloe Walker", country: "Canada" },
+  { name: "Nathan Brooks", country: "Canada" },
+  { name: "Evelyn Morin", country: "Canada" },
+  { name: "Fernando Castillo", country: "Mexico" },
+  { name: "Sofia Ramirez", country: "Mexico" },
+  { name: "Carlos Ortega", country: "Mexico" },
 
   // South America
-  { name: "Gabriela Oliveira", country: "Brazil" },
-  { name: "Thiago Costa", country: "Brazil" },
-  { name: "Valeria Martinez", country: "Argentina" },
-  { name: "Santiago Perez", country: "Argentina" },
-  { name: "Catalina Flores", country: "Chile" },
-  { name: "Sebastian Gomez", country: "Colombia" },
-  { name: "Lucia Torres", country: "Peru" },
+  { name: "Larissa Alves", country: "Brazil" },
+  { name: "Felipe Moreira", country: "Brazil" },
+  { name: "Marcos Duarte", country: "Brazil" },
+  { name: "Rocio Fernandez", country: "Argentina" },
+  { name: "Ignacio Alvarez", country: "Argentina" },
+  { name: "Camila Rojas", country: "Argentina" },
+  { name: "Francisca Herrera", country: "Chile" },
+  { name: "Nicolas Reyes", country: "Chile" },
+  { name: "Juan Camilo Arias", country: "Colombia" },
+  { name: "Andrea Moreno", country: "Colombia" },
+  { name: "Sofia Paredes", country: "Peru" },
+  { name: "Miguel Vargas", country: "Peru" },
 
   // Europe
-  { name: "Hannah Schmidt", country: "Germany" },
-  { name: "Louis Bernard", country: "France" },
-  { name: "Giulia Romano", country: "Italy" },
-  { name: "William Johnson", country: "United Kingdom" },
-  { name: "Eva Novakova", country: "Czech Republic" },
-  { name: "Jakub Nowak", country: "Poland" },
-  { name: "Milica Ivanovic", country: "Serbia" },
-  { name: "Luka Kovac", country: "Croatia" },
-  { name: "Anastasia Volkova", country: "Russia" },
-  { name: "Emma Johansson", country: "Sweden" },
-  { name: "Lukas Nielsen", country: "Denmark" },
-  { name: "Paula Sanchez", country: "Spain" },
-  { name: "Dimitris Georgiou", country: "Greece" },
-  { name: "Rafael Silva", country: "Portugal" },
-  { name: "Bence Nagy", country: "Hungary" },
-  { name: "Andrei Popescu", country: "Romania" },
-  { name: "Tomas Horvath", country: "Slovakia" },
-  { name: "Ida Virtanen", country: "Finland" },
-  { name: "Erik Stefansson", country: "Iceland" },
-  { name: "Maja Kovač", country: "Slovenia" },
-  { name: "Luka Zupan", country: "Slovenia" },
+  { name: "Jonas Fischer", country: "Germany" },
+  { name: "Clara Weber", country: "Germany" },
+  { name: "Mathieu Dubois", country: "France" },
+  { name: "Claire Fournier", country: "France" },
+  { name: "Matteo Bianchi", country: "Italy" },
+  { name: "Chiara Conti", country: "Italy" },
+  { name: "Oliver Wright", country: "United Kingdom" },
+  { name: "Amelia Harris", country: "United Kingdom" },
+  { name: "Katerina Vesela", country: "Czech Republic" },
+  { name: "Jan Novak", country: "Czech Republic" },
+  { name: "Piotr Kowalski", country: "Poland" },
+  { name: "Zofia Lewandowska", country: "Poland" },
+  { name: "Stefan Markovic", country: "Serbia" },
+  { name: "Jovana Milenkovic", country: "Serbia" },
+  { name: "Marko Horvat", country: "Croatia" },
+  { name: "Ivana Marin", country: "Croatia" },
+  { name: "Yelena Smirnova", country: "Russia" },
+  { name: "Dmitry Ivanov", country: "Russia" },
+  { name: "Freja Lindberg", country: "Sweden" },
+  { name: "Oscar Lindqvist", country: "Sweden" },
+  { name: "Anders Kristensen", country: "Denmark" },
+  { name: "Sofie Madsen", country: "Denmark" },
+  { name: "Javier Morales", country: "Spain" },
+  { name: "Laura Torres", country: "Spain" },
+  { name: "Nikos Papadopoulos", country: "Greece" },
+  { name: "Eleni Karagianni", country: "Greece" },
+  { name: "João Ferreira", country: "Portugal" },
+  { name: "Marta Rocha", country: "Portugal" },
+  { name: "Ádám Kovács", country: "Hungary" },
+  { name: "Réka Tóth", country: "Hungary" },
+  { name: "Mihai Ionescu", country: "Romania" },
+  { name: "Elena Stan", country: "Romania" },
+  { name: "Martin Balaz", country: "Slovakia" },
+  { name: "Zuzana Kralova", country: "Slovakia" },
+  { name: "Oskari Laine", country: "Finland" },
+  { name: "Aino Niemi", country: "Finland" },
+  { name: "Bjorn Sigurdsson", country: "Iceland" },
+  { name: "Sigrun Olafsdottir", country: "Iceland" },
+  { name: "Nika Hribar", country: "Slovenia" },
+  { name: "Tina Zupan", country: "Slovenia" },
 
   // Africa
-  { name: "Kwasi Boateng", country: "Ghana" },
-  { name: "Aisha Adebayo", country: "Nigeria" },
-  { name: "Cheikh Ndiaye", country: "Senegal" },
-  { name: "Aminata Coulibaly", country: "Mali" },
-  { name: "Thando Mbatha", country: "South Africa" },
-  { name: "Tendai Banda", country: "Zambia" },
-  { name: "Joseph Kamau", country: "Kenya" },
-  { name: "Fatuma Abdi", country: "Somalia" },
-  { name: "Youssef Ben Ali", country: "Tunisia" },
-  { name: "Karim El Masry", country: "Egypt" },
-  { name: "Leila Amrani", country: "Morocco" },
-  { name: "Samir Boukadoum", country: "Algeria" },
+  { name: "Kwame Mensah", country: "Ghana" },
+  { name: "Ama Serwaa", country: "Ghana" },
+  { name: "Chinedu Okafor", country: "Nigeria" },
+  { name: "Ngozi Eze", country: "Nigeria" },
+  { name: "Moussa Diop", country: "Senegal" },
+  { name: "Fatoumata Ba", country: "Senegal" },
+  { name: "Ousmane Traore", country: "Mali" },
+  { name: "Salimata Keita", country: "Mali" },
+  { name: "Sipho Nkosi", country: "South Africa" },
+  { name: "Nomvula Dlamini", country: "South Africa" },
+  { name: "Patrick Zulu", country: "Zambia" },
+  { name: "Chipo Phiri", country: "Zambia" },
+  { name: "Peter Njoroge", country: "Kenya" },
+  { name: "Grace Wanjiru", country: "Kenya" },
+  { name: "Abdirahman Warsame", country: "Somalia" },
+  { name: "Ayaan Hassan", country: "Somalia" },
+  { name: "Hichem Ben Salah", country: "Tunisia" },
+  { name: "Nadia Gharbi", country: "Tunisia" },
+  { name: "Omar Hassan", country: "Egypt" },
+  { name: "Salma Farouk", country: "Egypt" },
+  { name: "Hind El Fassi", country: "Morocco" },
+  { name: "Yassine Ait Benhaddou", country: "Morocco" },
+  { name: "Abdelkader Mansouri", country: "Algeria" },
+  { name: "Farida Haddad", country: "Algeria" },
 
   // Asia
-  { name: "Arjun Desai", country: "India" },
-  { name: "Xiao Wei", country: "China" },
-  { name: "Haruto Sato", country: "Japan" },
-  { name: "Ali Raza", country: "Pakistan" },
-  { name: "Mai Pham", country: "Vietnam" },
-  { name: "Priya Fernando", country: "Sri Lanka" },
-  { name: "Dewi Sari", country: "Indonesia" },
-  { name: "Min Aung", country: "Myanmar" },
-  { name: "Ji-hoon Park", country: "South Korea" },
-  { name: "Rahim Khan", country: "Bangladesh" },
-  { name: "Karma Dorji", country: "Bhutan" },
-  { name: "Bikash Gurung", country: "Nepal" },
-  { name: "Nazira Abdullaeva", country: "Uzbekistan" },
-  { name: "Lobsang Tenzin", country: "Tibet" },
-  { name: "Aisyah Tan", country: "Malaysia" },
-  { name: "Somsak Vong", country: "Thailand" },
+  { name: "Ravi Kapoor", country: "India" },
+  { name: "Neha Sharma", country: "India" },
+  { name: "Chen Liang", country: "China" },
+  { name: "Li Mei", country: "China" },
+  { name: "Ren Takahashi", country: "Japan" },
+  { name: "Aiko Nakamura", country: "Japan" },
+  { name: "Hassan Javed", country: "Pakistan" },
+  { name: "Sana Iqbal", country: "Pakistan" },
+  { name: "Nguyen Van Minh", country: "Vietnam" },
+  { name: "Tran Thi Hoa", country: "Vietnam" },
+  { name: "Dilshan Perera", country: "Sri Lanka" },
+  { name: "Anjali Perera", country: "Sri Lanka" },
+  { name: "Putri Wijaya", country: "Indonesia" },
+  { name: "Rizky Santoso", country: "Indonesia" },
+  { name: "Aung Kyaw", country: "Myanmar" },
+  { name: "Hnin Htet", country: "Myanmar" },
+  { name: "Kim Min-seok", country: "South Korea" },
+  { name: "Seo Ji-yeon", country: "South Korea" },
+  { name: "Abdul Rahman", country: "Bangladesh" },
+  { name: "Rafiqa Begum", country: "Bangladesh" },
+  { name: "Tenzin Choden", country: "Bhutan" },
+  { name: "Sonam Wangchuk", country: "Bhutan" },
+  { name: "Sanjay Rai", country: "Nepal" },
+  { name: "Puja Shrestha", country: "Nepal" },
+  { name: "Bekzod Rakhimov", country: "Uzbekistan" },
+  { name: "Dilnoza Karimova", country: "Uzbekistan" },
+  { name: "Nguyen Phuoc", country: "Malaysia" },
+  { name: "Nurul Huda", country: "Malaysia" },
+  { name: "Preecha Srisuk", country: "Thailand" },
+  { name: "Chanthira Wong", country: "Thailand" },
 
   // Middle East
-  { name: "Yousef Al-Mansour", country: "Saudi Arabia" },
-  { name: "Leila Chamoun", country: "Lebanon" },
-  { name: "Khalid Al-Farsi", country: "Oman" },
-  { name: "Noor Abbas", country: "Iraq" },
-  { name: "Tariq Khalil", country: "Jordan" },
-  { name: "Mariam Al-Thani", country: "Qatar" },
-  { name: "Samir Nassar", country: "Palestine" },
+  { name: "Fahad Al-Harbi", country: "Saudi Arabia" },
+  { name: "Aisha Al-Qahtani", country: "Saudi Arabia" },
+  { name: "Rami Karam", country: "Lebanon" },
+  { name: "Joumana Saad", country: "Lebanon" },
+  { name: "Said Al-Maawali", country: "Oman" },
+  { name: "Layla Al-Harthy", country: "Oman" },
+  { name: "Zain Abbas", country: "Iraq" },
+  { name: "Huda Al-Samarrai", country: "Iraq" },
+  { name: "Fares Haddad", country: "Jordan" },
+  { name: "Reem Al-Mutairi", country: "Jordan" },
+  { name: "Hamad Al-Kuwari", country: "Qatar" },
+  { name: "Fatima Al-Marri", country: "Qatar" },
+  { name: "Omar Barakat", country: "Palestine" },
+  { name: "Rania Saleh", country: "Palestine" },
 
   // Oceania
-  { name: "Noah Taylor", country: "Australia" },
-  { name: "Charlotte Smith", country: "New Zealand" },
-  { name: "Litia Vakacegu", country: "Fiji" },
-  { name: "Malo Tui", country: "Samoa" },
-  { name: "Sione Fakahua", country: "Tonga" },
+  { name: "Liam Edwards", country: "Australia" },
+  { name: "Sophie Wilson", country: "Australia" },
+  { name: "Harrison Clarke", country: "New Zealand" },
+  { name: "Isla Thompson", country: "New Zealand" },
+  { name: "Merewai Nasilasila", country: "Fiji" },
+  { name: "Tevita Rokotui", country: "Fiji" },
+  { name: "Tasi Leota", country: "Samoa" },
+  { name: "Moana Faumuina", country: "Samoa" },
+  { name: "Kava Latu", country: "Tonga" },
+  { name: "Mele Vea", country: "Tonga" },
 
   // Caribbean
-  { name: "Devon Brown", country: "Jamaica" },
-  { name: "Shanice Williams", country: "Trinidad and Tobago" },
-  { name: "Marcus King", country: "Barbados" },
-  { name: "Danielle Joseph", country: "Saint Lucia" },
+  { name: "Andre Campbell", country: "Jamaica" },
+  { name: "Keisha Brown", country: "Jamaica" },
+  { name: "Darren Charles", country: "Trinidad and Tobago" },
+  { name: "Kiana Peters", country: "Trinidad and Tobago" },
+  { name: "Dwayne Griffith", country: "Barbados" },
+  { name: "Aaliyah Clarke", country: "Barbados" },
+  { name: "Jean-Marc Laurent", country: "Saint Lucia" },
+  { name: "Alana Baptiste", country: "Saint Lucia" },
 
-  // Eastern Europe/Central Asia
-  { name: "Oksana Melnyk", country: "Ukraine" },
-  { name: "Ivan Petrov", country: "Belarus" },
-  { name: "Nino Beridze", country: "Georgia" },
-  { name: "Aisuluu Asanova", country: "Kyrgyzstan" },
-  { name: "Aruzhan Kazi", country: "Kazakhstan" },
+  // Eastern Europe / Central Asia
+  { name: "Olena Bondarenko", country: "Ukraine" },
+  { name: "Taras Shevchenko", country: "Ukraine" },
+  { name: "Sergey Morozov", country: "Belarus" },
+  { name: "Anna Kovalenko", country: "Belarus" },
+  { name: "Giorgi Lomidze", country: "Georgia" },
+  { name: "Mariam Gelashvili", country: "Georgia" },
+  { name: "Bakytbek Mamatov", country: "Kyrgyzstan" },
+  { name: "Aizada Sadykova", country: "Kyrgyzstan" },
+  { name: "Yerlan Nurtayev", country: "Kazakhstan" },
+  { name: "Aigerim Saparova", country: "Kazakhstan" },
 ];
 
+
 const ACTIVITIES: Activity[] = [
-  // Trading signals
-  {
-    text: "acquired the [signal] trading package",
-    hasAmount: true,
-    min: 1000,
-    max: 15900,
-  },
+  { text: "acquired the [signal] trading package", hasAmount: true, min: 1000, max: 15900 },
   { text: "joined [plan] membership", hasAmount: true, min: 1000, max: 25000 },
-
-  // Real estate investments
-  {
-    text: "funded [property] development",
-    hasAmount: true,
-    min: 12000,
-    max: 33000,
-  },
-
-  // Staking
-  {
-    text: "committed [amount] to [crypto] staking",
-    hasAmount: true,
-    min: 1,
-    max: 200,
-  },
-  {
-    text: "gained [amount] from staking returns",
-    hasAmount: true,
-    min: 0.1,
-    max: 10,
-  },
-
-  // Account actions
+  { text: "funded [property] development", hasAmount: true, min: 12000, max: 33000 },
+  { text: "committed [amount] to [crypto] staking", hasAmount: true, min: 1, max: 200 },
+  { text: "gained [amount] from staking returns", hasAmount: true, min: 0.1, max: 10 },
   { text: "completed identity verification", hasAmount: false },
   { text: "updated profile information", hasAmount: false },
   { text: "modified security settings", hasAmount: false },
-
-  // Financial actions
   { text: "added [amount] to balance", hasAmount: true, min: 100, max: 50000 },
   { text: "withdrew [amount] funds", hasAmount: true, min: 50, max: 20000 },
-  {
-    text: "sent [amount] to another member",
-    hasAmount: true,
-    min: 10,
-    max: 5000,
-  },
-
-  // Referrals
-  {
-    text: "earned [amount] through referrals",
-    hasAmount: true,
-    min: 10,
-    max: 500,
-  },
+  { text: "sent [amount] to another member", hasAmount: true, min: 10, max: 5000 },
+  { text: "earned [amount] through referrals", hasAmount: true, min: 10, max: 500 },
   { text: "invited a new member", hasAmount: false },
 ];
 
-const SIGNAL_PACKAGES = [
-  "TradeMaster Pro",
-  "Alpha Signals",
-  "Quantum Trading",
-  "Pip Hunter",
-  "Elite Trader Suite",
-  "Market Navigator",
-];
-
+const SIGNAL_PACKAGES = ["TradeMaster Pro", "Alpha Signals", "Quantum Trading", "Pip Hunter", "Elite Trader Suite", "Market Navigator"];
 const MEMBERSHIPS = ["Gold", "Diamond", "Executive", "Basic"];
-
-const DEVELOPMENTS = [
-  "Harbor View Towers",
-  "Tech Park Silicon Valley",
-  "Storage Solutions Austin",
-  "University Heights Dorms",
-  "Greenfield Industrial Zone",
-  "Innovation Hub Dallas",
-];
-
-const CRYPTO_ASSETS = [
-  "Bitcoin",
-  "Ethereum",
-  "Cardano",
-  "Solana",
-  "Polkadot",
-  "Avalanche",
-  "Chainlink",
-  "Litecoin",
-  "Ripple",
-];
+const DEVELOPMENTS = ["Harbor View Towers", "Tech Park Silicon Valley", "Storage Solutions Austin", "University Heights Dorms", "Greenfield Industrial Zone", "Innovation Hub Dallas"];
+const CRYPTO_ASSETS = ["Bitcoin", "Ethereum", "Cardano", "Solana", "Polkadot", "Avalanche", "Chainlink", "Litecoin", "Ripple"];
 
 const INITIAL_DELAY = 3000;
 const DISPLAY_DURATION = 7000;
@@ -225,6 +230,8 @@ const ActivityNotification = () => {
   const [currentNotification, setCurrentNotification] = useState<Notification | null>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [hasUserInteracted, setHasUserInteracted] = useState(false);
+
+  const [play] = useSound("/sound/alert.wav", { volume: 0.5 });
 
   const formatValue = (min: number, max: number, isCrypto = false): string => {
     const value = Math.random() * (max - min) + min;
@@ -240,45 +247,28 @@ const ActivityNotification = () => {
     }).format(value);
   };
 
-  const createRandomNotification = (): Notification => {
+  const createRandomNotification = useCallback((): Notification => {
     const randomParticipant = PARTICIPANTS[Math.floor(Math.random() * PARTICIPANTS.length)];
     const randomActivity = ACTIVITIES[Math.floor(Math.random() * ACTIVITIES.length)];
-    const time = new Date().toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    const time = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
     let activityText = randomActivity.text;
-    if (randomActivity.hasAmount) {
-      if (randomActivity.min !== undefined && randomActivity.max !== undefined) {
-        const isCrypto = activityText.includes("staking") || activityText.includes("committed");
-        const value = formatValue(randomActivity.min, randomActivity.max, isCrypto);
-        activityText = activityText.replace("[amount]", value);
-      }
+    if (randomActivity.hasAmount && randomActivity.min !== undefined && randomActivity.max !== undefined) {
+      const isCrypto = activityText.includes("staking") || activityText.includes("committed");
+      const value = formatValue(randomActivity.min, randomActivity.max, isCrypto);
+      activityText = activityText.replace("[amount]", value);
 
       if (activityText.includes("[signal]")) {
-        activityText = activityText.replace(
-          "[signal]",
-          SIGNAL_PACKAGES[Math.floor(Math.random() * SIGNAL_PACKAGES.length)]
-        );
+        activityText = activityText.replace("[signal]", SIGNAL_PACKAGES[Math.floor(Math.random() * SIGNAL_PACKAGES.length)]);
       }
       if (activityText.includes("[plan]")) {
-        activityText = activityText.replace(
-          "[plan]",
-          MEMBERSHIPS[Math.floor(Math.random() * MEMBERSHIPS.length)]
-        );
+        activityText = activityText.replace("[plan]", MEMBERSHIPS[Math.floor(Math.random() * MEMBERSHIPS.length)]);
       }
       if (activityText.includes("[property]")) {
-        activityText = activityText.replace(
-          "[property]",
-          DEVELOPMENTS[Math.floor(Math.random() * DEVELOPMENTS.length)]
-        );
+        activityText = activityText.replace("[property]", DEVELOPMENTS[Math.floor(Math.random() * DEVELOPMENTS.length)]);
       }
       if (activityText.includes("[crypto]")) {
-        activityText = activityText.replace(
-          "[crypto]",
-          CRYPTO_ASSETS[Math.floor(Math.random() * CRYPTO_ASSETS.length)]
-        );
+        activityText = activityText.replace("[crypto]", CRYPTO_ASSETS[Math.floor(Math.random() * CRYPTO_ASSETS.length)]);
       }
     }
 
@@ -289,7 +279,7 @@ const ActivityNotification = () => {
       activity: activityText,
       time,
     };
-  };
+  }, []);
 
   useEffect(() => {
     const handleInteraction = () => {
@@ -311,70 +301,76 @@ const ActivityNotification = () => {
   }, []);
 
   useEffect(() => {
-    let initialDelayTimer: NodeJS.Timeout;
+    if (!hasUserInteracted) return;
+
     let hideTimeout: NodeJS.Timeout;
 
     const displayNewNotification = () => {
       const newNotification = createRandomNotification();
       setCurrentNotification(newNotification);
       setIsVisible(true);
+      play();
 
       hideTimeout = setTimeout(() => {
         setIsVisible(false);
-        setTimeout(() => {
-          displayNewNotification();
-        }, TRANSITION_DURATION);
+        setTimeout(displayNewNotification, TRANSITION_DURATION);
       }, DISPLAY_DURATION);
     };
 
-    initialDelayTimer = setTimeout(() => {
-      displayNewNotification();
-    }, INITIAL_DELAY);
+    const initialDelayTimer: NodeJS.Timeout = setTimeout(displayNewNotification, INITIAL_DELAY);
 
     return () => {
       clearTimeout(initialDelayTimer);
       clearTimeout(hideTimeout);
     };
-  }, [hasUserInteracted]);
+  }, [hasUserInteracted, play, createRandomNotification]);
 
-return (
-  <div className="fixed left-4 bottom-4 z-50 w-72 sm:w-80 md:w-96">
-    <div
-      className={`transition-all duration-300 ease-in-out ${
-        isVisible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
-      }`}
-    >
-      {currentNotification && (
-        <div className="bg-slate-800 shadow-xl border border-teal-500 overflow-hidden rounded-tl-xl rounded-br-xl">
-          <div className="p-3">
-            <div className="flex items-start">
-              <div className="flex-shrink-0 h-8 w-8 rounded-full bg-teal-900 flex items-center justify-center text-teal-300 font-bold">
-                {currentNotification.name.charAt(0)}
-              </div>
-              <div className="ml-2">
-                <p className="text-xs font-medium text-slate-100">
-                  {currentNotification.name}{" "}
-                  <span className="text-xs text-slate-400">
-                    ({currentNotification.country})
-                  </span>
-                </p>
-                <p className="text-xs text-teal-300">{currentNotification.activity}</p>
-                <p className="text-xs text-slate-500 mt-1">
-                  {currentNotification.time}
-                </p>
-              </div>
+  return (
+<div className="fixed left-4 bottom-4 z-50 w-64 sm:w-72 md:w-80">
+  <div
+    className={`transition-all duration-300 ease-in-out ${
+      isVisible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
+    }`}
+  >
+    {currentNotification && (
+      <div className="bg-slate-800 shadow-lg border border-transparent rounded-tl-xl rounded-br-xl relative overflow-hidden">
+        
+        {/* Gradient Border Glow */}
+        <div className="absolute inset-0 rounded-tl-xl rounded-br-xl p-[1px] bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-400 animate-gradient"></div>
+        
+        {/* Inner Container */}
+        <div className="relative bg-slate-800 rounded-tl-xl rounded-br-xl p-3">
+          <div className="flex items-start">
+            {/* Avatar Circle */}
+            <div className="flex-shrink-0 h-8 w-8 rounded-full bg-cyan-900 flex items-center justify-center text-cyan-300 font-bold shadow-md">
+              {currentNotification.name.charAt(0)}
+            </div>
+            
+            {/* Notification Text */}
+            <div className="ml-2">
+              <p className="text-xs font-medium text-slate-100">
+                {currentNotification.name}{" "}
+                <span className="text-xs text-slate-400">
+                  ({currentNotification.country})
+                </span>
+              </p>
+              <p className="text-xs text-cyan-300">{currentNotification.activity}</p>
+              <p className="text-xs text-slate-500 mt-1">{currentNotification.time}</p>
             </div>
           </div>
-          <div
-            className="h-0.5 w-full bg-teal-500 animate-progress"
-            style={{ animationDuration: `${DISPLAY_DURATION}ms` }}
-          ></div>
         </div>
-      )}
-    </div>
-  </div>
-);
 
-}
+        {/* Gradient Progress Bar */}
+        <div
+          className="h-0.5 w-full bg-gradient-to-r from-cyan-400 via-pink-400 to-purple-500 animate-progress"
+          style={{ animationDuration: `${DISPLAY_DURATION}ms` }}
+        ></div>
+      </div>
+    )}
+  </div>
+</div>
+
+  );
+};
 
 export default ActivityNotification;
