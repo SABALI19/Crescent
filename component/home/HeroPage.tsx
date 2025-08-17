@@ -90,22 +90,22 @@ export default function HeroPage() {
           </div>
           
           {/* Main Heading with responsive line breaks */}
-          <h1 className="text-4xl md:text-5xl font-bold leading-tight text-white mt-4">
-            The next generation
-            <br className="hidden md:block" />
-            <span className="block md:inline">
-              <span className="hidden md:inline">of </span>
-              <span className="md:hidden">Invest Smart, Invest Secure,</span>
-              <span className="hidden md:inline">Invest Smart, Invest Secure,</span>
-              <br className="md:hidden" />
-              <span className="md:hidden">Invest in CRESCENT..</span>
-              <span className="hidden md:inline">Invest in CRESCENT...</span>
-            </span>
-            <br className="hidden md:block" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-teal-300 mt-2 inline-block">
-              crypto experience
-            </span>
-          </h1>
+<h1 className="font-bold leading-tight text-white text-center space-y-4">
+  <span className="text-4xl md:text-5xl block whitespace-nowrap">
+    THE NEXT GENERATION
+  </span>
+  <span className="text-3xl md:text-4xl block whitespace-nowrap tracking-widest">
+    INVEST SMART, INVEST SECURE
+  </span>
+  <span className="text-2xl md:text-3xl block whitespace-nowrap tracking-widest">
+    INVEST IN CRESCENT
+  </span>
+  <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-teal-300 inline-block whitespace-nowrap">
+    crypto experience
+  </span>
+</h1>
+
+
           
           {/* Subtitle */}
           <p className="text-lg text-green-200 max-w-2xl mx-auto leading-relaxed mt-6">
