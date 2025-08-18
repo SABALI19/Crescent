@@ -2,9 +2,19 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { FaBitcoin, FaDownload, FaChrome, FaArrowRight } from 'react-icons/fa';
+import { FaBitcoin, FaEthereum, FaDownload, FaChrome, FaArrowRight } from 'react-icons/fa';
 
 export default function HeroPage() {
+  // Animation configuration for the floating coins
+  const floatAnimation = {
+    y: [0, -15, 0],
+    transition: {
+      duration: 4,
+      repeat: Infinity,
+      ease: "easeInOut"
+    }
+  } as const; // Add 'as const' to fix TypeScript error
+
   return (
     <div className="relative flex items-center justify-center min-h-screen overflow-hidden">
       {/* Background Video */}
@@ -32,15 +42,84 @@ export default function HeroPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: 'easeOut' }}
       >
-        {/* Logo Animation */}
-        <motion.div
-          initial={{ scale: 0.9 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: 0.3, duration: 0.5 }}
-          className="mb-8 flex justify-center"
-        >
-          <div className="bg-amber-400/10 p-5 rounded-full backdrop-blur-sm border border-amber-400/30 shadow-md shadow-amber-500/10">
-            <FaBitcoin className="text-5xl text-amber-400" />
+        {/* Logo Animation - Three coins in triangle formation */}
+        <motion.div className="mb-8 flex flex-col items-center justify-center relative h-36">
+          {/* Bitcoin Logo - Centered at top (larger) */}
+          <motion.div
+            initial={{ scale: 0.9, y: 0 }}
+            animate={{
+              y: [0, -15, 0],
+              transition: {
+                delay: 0.3,
+                duration: 4,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }
+            }}
+            className="z-10 mb-2"
+          >
+            <div className="bg-amber-400/10 p-5 rounded-full backdrop-blur-sm border border-amber-400/30 shadow-md shadow-amber-500/10">
+              <FaBitcoin className="text-5xl text-amber-400" />
+            </div>
+          </motion.div>
+
+          {/* Ethereum and Crescent Logos - Positioned underneath (smaller) */}
+          <div className="flex justify-center gap-12 -mt-2">
+            {/* Ethereum Logo - Left */}
+            <motion.div
+              initial={{ scale: 0.9, y: 0 }}
+              animate={{
+                y: [0, -15, 0], // Changed to match Crescent logo
+                transition: {
+                  delay: 0.6,
+                  duration: 4,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }
+              }}
+              className="mt-4"
+            >
+              <div className="bg-purple-400/10 p-4 rounded-full backdrop-blur-sm border border-purple-400/30 shadow-md shadow-purple-500/10">
+                <FaEthereum className="text-4xl text-purple-400" />
+              </div>
+            </motion.div>
+
+            {/* Crescent Token Logo - Right */}
+            <motion.div
+              initial={{ scale: 0.9, y: 0 }}
+              animate={{
+                y: [0, -15, 0],
+                transition: {
+                  delay: 0.9,
+                  duration: 4,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }
+              }}
+              className="mt-4"
+            >
+              <div className="bg-green-400/10 p-4 rounded-full backdrop-blur-sm border border-green-400/30 shadow-md shadow-green-500/10">
+                <svg 
+                  width="40" 
+                  height="40" 
+                  viewBox="0 0 48 48"
+                  className="text-green-400"
+                >
+                  <path 
+                    d="M24 40C32.8366 40 40 32.8366 40 24C40 15.1634 32.8366 8 24 8C15.1634 8 8 15.1634 8 24C8 32.8366 15.1634 40 24 40Z" 
+                    fill="currentColor"
+                    opacity="0.8"
+                  />
+                  <path 
+                    d="M30 12C36 14 40 19 40 24C40 29 36 34 30 36C24 38 18 36 14 30C10 24 12 18 18 14C22 12 26 12 30 12Z" 
+                    fill="#111827"
+                  />
+                  <circle cx="30" cy="20" r="1.5" fill="#ffffff33" />
+                  <circle cx="25" cy="28" r="2" fill="#ffffff22" />
+                  <circle cx="32" cy="32" r="1" fill="#ffffff44" />
+                </svg>
+              </div>
+            </motion.div>
           </div>
         </motion.div>
 
@@ -90,22 +169,20 @@ export default function HeroPage() {
           </div>
           
           {/* Main Heading with responsive line breaks */}
-<h1 className="font-bold leading-tight text-white text-center space-y-4">
-  <span className="text-4xl md:text-5xl block whitespace-nowrap">
-    THE NEXT GENERATION
-  </span>
-  <span className="text-3xl md:text-4xl block whitespace-nowrap tracking-widest">
-    INVEST SMART, INVEST SECURE
-  </span>
-  <span className="text-2xl md:text-3xl block whitespace-nowrap tracking-widest">
-    INVEST IN CRESCENT
-  </span>
-  <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-teal-300 inline-block whitespace-nowrap">
-    crypto experience
-  </span>
-</h1>
-
-
+          <h1 className="font-bold leading-tight text-white text-center space-y-4">
+            <span className="text-4xl md:text-5xl block whitespace-nowrap">
+              THE NEXT GENERATION
+            </span>
+            <span className="text-3xl md:text-4xl block whitespace-nowrap tracking-widest">
+              INVEST SMART, INVEST SECURE
+            </span>
+            <span className="text-2xl md:text-3xl block whitespace-nowrap tracking-widest">
+              INVEST IN CRESCENT
+            </span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-teal-300 inline-block whitespace-nowrap">
+              crypto experience
+            </span>
+          </h1>
           
           {/* Subtitle */}
           <p className="text-lg text-green-200 max-w-2xl mx-auto leading-relaxed mt-6">
