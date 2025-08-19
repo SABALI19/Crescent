@@ -235,7 +235,7 @@ export default function Headerpage() {
                 role="menu"
                 aria-label="Trade submenu"
               >
-                <div className="py-1">
+                <div className="py-2">
                   <a
                     href="#"
                     className="flex items-center px-4 py-2 text-sm hover:bg-gray-700 focus:bg-gray-700 focus:outline-none transition-colors rounded mx-1 my-1"
