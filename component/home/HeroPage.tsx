@@ -2,21 +2,67 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { FaBitcoin, FaEthereum, FaDownload, FaChrome, FaArrowRight } from 'react-icons/fa';
+import { FaBitcoin, FaEthereum, FaDownload, FaChrome, FaArrowRight, FaGlobe } from 'react-icons/fa';
+import { useLanguage } from '@/context/LanguageContext';
+import { translations } from '@/component/home/translation'; // Adjust the path as needed
 
 export default function HeroPage() {
-  // Animation configuration for the floating coins
-  const floatAnimation = {
-    y: [0, -15, 0],
-    transition: {
-      duration: 4,
-      repeat: Infinity,
-      ease: "easeInOut"
-    }
-  } as const; // Add 'as const' to fix TypeScript error
+  const { language, setLanguage } = useLanguage();
+  
+  // Get translations for current language, fallback to English if not found
+  const t = translations[language] || translations.en;
+  
+  // Language options with display names
+  const languages = [
+    { code: "en", name: "English" },
+    { code: "es", name: "Español" },
+    { code: "fr", name: "Français" },
+    { code: "de", name: "Deutsch" },
+    { code: "it", name: "Italiano" },
+    { code: "pt", name: "Português" },
+    { code: "ru", name: "Русский" },
+    { code: "zh", name: "中文" },
+    { code: "ja", name: "日本語" },
+    { code: "ko", name: "한국어" },
+    { code: "ar", name: "العربية" },
+    { code: "hi", name: "हिन्दी" },
+    { code: "tr", name: "Türkçe" },
+    { code: "nl", name: "Nederlands" },
+    { code: "sv", name: "Svenska" },
+    { code: "pl", name: "Polski" },
+    { code: "uk", name: "Українська" },
+    { code: "th", name: "ไทย" },
+    { code: "vi", name: "Tiếng Việt" },
+  ];
 
   return (
     <div className="relative flex items-center justify-center min-h-screen overflow-hidden">
+      {/* Language Selector - Top Right Corner */}
+      <div className="absolute top-6 right-6 z-20">
+        <div className="relative group">
+          <button className="flex items-center justify-center w-10 h-10 rounded-full bg-black/30 backdrop-blur-sm border border-white/20 hover:border-white/40 transition-colors">
+            <FaGlobe className="text-white text-lg" />
+          </button>
+          
+          {/* Language Dropdown */}
+          <div className="absolute right-0 top-full mt-2 w-40 py-2 bg-gray-900/95 backdrop-blur-md rounded-lg shadow-xl border border-white/10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+            {languages.map((lang) => (
+              <button
+                key={lang.code}
+                onClick={() => setLanguage(lang.code)}
+                className={`w-full text-left px-4 py-2 text-sm hover:bg-green-800/30 transition-colors ${
+                  language === lang.code 
+                    ? 'text-green-400 font-medium' 
+                    : 'text-white/80'
+                }`}
+              >
+                {lang.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* Background Video */}
       <video
         autoPlay
@@ -69,7 +115,7 @@ export default function HeroPage() {
             <motion.div
               initial={{ scale: 0.9, y: 0 }}
               animate={{
-                y: [0, -15, 0], // Changed to match Crescent logo
+                y: [0, -15, 0],
                 transition: {
                   delay: 0.6,
                   duration: 4,
@@ -171,23 +217,22 @@ export default function HeroPage() {
           {/* Main Heading with responsive line breaks */}
           <h1 className="font-bold leading-tight text-white text-center space-y-4">
             <span className="text-4xl md:text-5xl block whitespace-nowrap">
-              THE NEXT GENERATION
+              {t.heading1}
             </span>
             <span className="text-3xl md:text-4xl block whitespace-nowrap tracking-widest">
-              INVEST SMART, INVEST SECURE
+              {t.heading2}
             </span>
             <span className="text-2xl md:text-3xl block whitespace-nowrap tracking-widest">
-              INVEST IN CRESCENT
+              {t.heading3}
             </span>
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-teal-300 inline-block whitespace-nowrap">
-              crypto experience
+              {t.subHeading}
             </span>
           </h1>
           
           {/* Subtitle */}
           <p className="text-lg text-green-200 max-w-2xl mx-auto leading-relaxed mt-6">
-            Take full control of your digital assets with our non-custodial multi-chain
-            solution. Security meets simplicity in one powerful platform.
+            {t.subtitle}
           </p>
           
           {/* CTA Buttons */}
@@ -199,7 +244,7 @@ export default function HeroPage() {
                 className="bg-gradient-to-r from-green-500 to-teal-500 text-white font-bold px-8 py-4 rounded-lg hover:opacity-90 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center gap-3"
               >
                 <FaDownload className="text-lg" />
-                Get Started
+                {t.getStarted}
               </motion.button>
             </Link>
             
@@ -210,7 +255,7 @@ export default function HeroPage() {
                 className="border-2 border-green-400 text-green-100 font-bold px-8 py-4 rounded-lg hover:bg-green-900/30 transition-all duration-300 flex items-center gap-3 group"
               >
                 <FaChrome className="text-green-300 group-hover:text-white text-lg" />
-                Chrome Extensions
+                {t.chromeExt}
                 <FaArrowRight className="opacity-0 group-hover:opacity-100 transition-all duration-300 transform -translate-x-2 group-hover:translate-x-0" />
               </motion.button>
             </Link>

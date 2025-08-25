@@ -41,6 +41,7 @@ export default function ProfitCalculator() {
   const [amount, setAmount] = useState<string>("");
   const [profit, setProfit] = useState<string>("0.00");
   const [isCalculating, setIsCalculating] = useState<boolean>(false);
+  const [isVideoLoaded, setIsVideoLoaded] = useState<boolean>(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
@@ -89,6 +90,10 @@ export default function ProfitCalculator() {
     setIsCalculating(false);
   };
 
+  const handleVideoLoad = () => {
+    setIsVideoLoaded(true);
+  };
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -135,11 +140,22 @@ export default function ProfitCalculator() {
       variants={containerVariants}
       className="relative min-h-screen w-full overflow-hidden text-white"
     >
-      <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: `url(${bg2.src})` }}
-      />
-      <div className="absolute inset-0 bg-gradient-to-br from-gray-950/95 via-green-900/90 to-gray-900/95" />
+      {/* Video Background */}
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          onLoadedData={handleVideoLoad}
+          className="w-full h-full object-cover"
+        >
+          <source src="/videos/vd3.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+        {/* Dark overlay for better text readability */}
+        <div className="absolute inset-0 bg-black/70" />
+      </div>
 
       {/* Floating background particles */}
       {[...Array(15)].map((_, i) => (
@@ -148,7 +164,7 @@ export default function ProfitCalculator() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: i * 0.1, duration: 1 }}
-          className="absolute rounded-full bg-green-500/20 animate-float"
+          className="absolute rounded-full bg-green-500/20 animate-float z-10"
           style={{
             top: `${Math.random() * 100}%`,
             left: `${Math.random() * 100}%`,

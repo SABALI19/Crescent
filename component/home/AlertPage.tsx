@@ -336,13 +336,13 @@ const ActivityNotification = () => {
       <div className="bg-slate-800 shadow-lg border border-transparent rounded-tl-xl rounded-br-xl relative overflow-hidden">
         
         {/* Gradient Border Glow */}
-        <div className="absolute inset-0 rounded-tl-xl rounded-br-xl p-[1px] bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-400 animate-gradient"></div>
+        <div className="absolute inset-0 rounded-tl-xl rounded-br-xl p-[1px] bg-gradient-to-r from-purple-500 via-pink-500 to-green-400 animate-gradient"></div>
         
         {/* Inner Container */}
         <div className="relative bg-slate-800 rounded-tl-xl rounded-br-xl p-3">
           <div className="flex items-start">
             {/* Avatar Circle */}
-            <div className="flex-shrink-0 h-8 w-8 rounded-full bg-cyan-900 flex items-center justify-center text-cyan-300 font-bold shadow-md">
+            <div className="flex-shrink-0 h-8 w-8 rounded-full bg-green-900 flex items-center justify-center text-green-300 font-bold shadow-md">
               {currentNotification.name.charAt(0)}
             </div>
             
@@ -354,7 +354,7 @@ const ActivityNotification = () => {
                   ({currentNotification.country})
                 </span>
               </p>
-              <p className="text-xs text-cyan-300">{currentNotification.activity}</p>
+              <p className="text-xs text-green-300">{currentNotification.activity}</p>
               <p className="text-xs text-slate-500 mt-1">{currentNotification.time}</p>
             </div>
           </div>
@@ -362,7 +362,7 @@ const ActivityNotification = () => {
 
         {/* Gradient Progress Bar */}
         <div
-          className="h-0.5 w-full bg-gradient-to-r from-cyan-400 via-pink-400 to-purple-500 animate-progress"
+          className="h-0.5 w-full bg-gradient-to-r from-green-400 via-pink-400 to-purple-500 animate-progress"
           style={{ animationDuration: `${DISPLAY_DURATION}ms` }}
         ></div>
       </div>

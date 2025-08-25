@@ -1,12 +1,14 @@
-import React, { ReactNode } from 'react'
-import '../styles/globals.css'
-import Headerpage from '@/component/layout/header'
-import Footer from '@/component/layout/Footer'
+// app/layout.tsx
+import type { Metadata } from "next";
+import { ReactNode } from "react"
+import "../styles/globals.css"
+import Headerpage from "@/component/layout/header"
+import Footer from "@/component/layout/Footer"
+import { LanguageProvider } from "@/context/LanguageContext"
 
-
-export const metadata = {
-  title: 'Crescent',
-  description: 'Crescent Crypto Platform',
+export const metadata: Metadata = {
+  title: "Crescent",
+  description: "Crescent Crypto Platform",
 }
 
 interface RootLayoutProps {
@@ -17,11 +19,11 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en">
       <body>
-        <Headerpage />
-        <main>{children}
-
-        </main>
-        <Footer />
+        <LanguageProvider>
+          <Headerpage />
+          <main>{children}</main>
+          <Footer />
+        </LanguageProvider>
       </body>
     </html>
   )
